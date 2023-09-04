@@ -1,0 +1,48 @@
+```{r}
+library(readr)
+library(ggplot2)
+library(tidyverse)
+library(plyr); library(dplyr)
+rawdataset <- read_csv("rawdataset.csv")
+data<-as.data.frame(rawdataset)
+# Create a function to calculate frequencies and perform statistical analysis
+analyze_data <- function(column_name, sex_column_name) {
+  # Subset the data based on the column name
+  subset_data <- data[, c(column_name, sex_column_name)]
+  
+  # Recode sex column to "Male" and "Female"
+  subset_data[[sex_column_name]] <- ifelse(subset_data[[sex_column_name]] == 1, "Male", "Female")
+  
+  # Create a cross-tabulation table
+  freq_table <- table(subset_data)
+  
+  # Perform chi-square test
+  chi_test <- chisq.test(freq_table, simulate.p.value = TRUE)
+  
+  # Print the results
+  cat("\nColumn(s):", column_name, "\n")
+  cat("\nResponse Frequencies by Gender:\n")
+  print(freq_table)
+  cat("\nChi-Square Test Results:\n")
+  print(chi_test)
+}
+
+
+# Specify the range of columns to analyze (from X to Y)
+start_column <- "dc"
+end_column <- "hypnotics"
+
+
+# Specify the sex column name
+sex_column <- "sex"
+
+
+# Get the column names within the specified range
+columns_to_analyze <- colnames(data)[match(start_column, colnames(data)):match(end_column, colnames(data))]
+
+
+# Apply the analysis function to each column
+for (column in columns_to_analyze) {
+  analyze_data(column, sex_column)
+}
+```
